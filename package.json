@@ -1,0 +1,22 @@
+{
+  "name": "yack-google-drive",
+  "version": "0.1.0",
+  "description": "Google Drive app for Yack",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next -p 3003",
+    "build": "next build",
+    "start": "next start -p 3003"
+  },
+  "author": "Jo du Plessis",
+  "license": "MIT",
+  "dependencies": {
+    "@tryyack/dev-kit": "^0.1.3",
+    "@tryyack/elements": "^0.8.2",
+    "axios": "^0.19.2",
+    "googleapis": "^49.0.0",
+    "next": "^9.3.6",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
