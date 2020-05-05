@@ -5,7 +5,17 @@ const handler = nextConnect();
 
 handler
   .use(middleware)
-  .post(async (req, res) => {
+  .get(async (req, res) => {
+    try {
+      const { headers: { channelToken } } = req
+      const accounts = await req.db.collection('accounts').find({ channelToken }).toArray()
+
+      res.json({ accounts })
+    } catch (error) {
+      res.json({ error })
+    }
+  })
+  .post(async (req, res1) => {
     const { userId, token, scope, code } = req.body
     const { google } = require('googleapis')
     const oAuth2Client = new google.auth.OAuth2(
@@ -25,40 +35,36 @@ handler
       const oauth2Client = google.oauth2({ auth: oAuth2Client, version: 'v2' });
 
       // Get the user info
-      oauth2Client.userinfo.get((err, result) => {
+      oauth2Client.userinfo.get((err, res2) => {
           if (err) return console.log(err)
 
           // Just get the email
-          const { email } = result.data
+          const { email } = res2.data
 
           // Create a base64 encoded value from the token
           const base64 = Buffer.from(JSON.stringify(authToken)).toString('base64')
+          const account = {
+            authToken: base64,
+            channelToken: token || 'no channelToken',
+            userId: userId || 'no userId',
+            authEmail: email || 'no authEmail'
+          }
 
           // Store this in our DB
+          // And then send back the new account to the caller
+          // res1 is our API res
           req
             .db
             .collection('accounts')
-            .insert({
-              authToken: base64,
-              channelToken: token || 'no channelToken',
-              userId: userId || 'no userId',
-              authEmail: email || 'no authEmail'
-            })
-            .then(result => {
-              console.log(result)
-              res.json({ result })
+            .insertOne(account)
+            .then(res3 => {
+              res1.json({ account })
             })
             .catch(error => {
-              console.log(error)
-              res.json({ error })
+              res1.json({ error })
             })
       })
     })
-  })
-  .put(async (req, res) => {
-    let docs = await req.db.collection('accounts').find().toArray()
-
-    res.json(docs);
   })
 
 export default handler;
