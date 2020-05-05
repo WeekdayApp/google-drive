@@ -23,6 +23,7 @@ function Success(props) {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link href="https://yack-apps.s3.eu-central-1.amazonaws.com/styles.css" rel="stylesheet" />
         <link href="https://yack-apps.s3.eu-central-1.amazonaws.com/favicon.png" rel="shortcut icon" />
+        <link href="/static/css/styles.css" rel="stylesheet" />
       </Head>
 
       <style global jsx>{`

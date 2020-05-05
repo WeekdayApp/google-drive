@@ -16,9 +16,16 @@ handler
     }
   })
   .delete(async (req, res) => {
+    const { google } = require('googleapis')
+    const oAuth2Client = new google.auth.OAuth2(
+      process.env.CLIENT_ID,
+      process.env.CLIENT_SECRET,
+      process.env.REDIRECT_URL
+    )
+
     let doc = await req.db.collection('accounts').findOne()
 
-    oauth2Client.revokeToken(token, function(err, body) {
+    oAuth2Client.revokeToken(token, function(err, body) {
 
     })
 
