@@ -13,8 +13,7 @@ function Success(props) {
   const { scope, code } = props.query
 
   useEffect(() => {
-    window.top.postMessage({ oauthComplete: true, scope, code }, "*")
-    window.opener.postMessage({ oauthComplete: true, scope, code }, "*")
+    window.opener.postMessage({ scope, code }, "*")
   }, [])
 
   return (
