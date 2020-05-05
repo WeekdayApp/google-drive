@@ -3,6 +3,7 @@ import { useRouter, withRouter } from 'next/router'
 import Head from 'next/head'
 import { Button, Error, Loading, Notification, Spinner } from '@tryyack/elements'
 import { openAppModal } from '@tryyack/dev-kit'
+import fetch from 'isomorphic-unfetch'
 
 function Index(props) {
   const { router: { query }} = props
@@ -80,27 +81,45 @@ function Index(props) {
   )
 }
 
-Index.getInitialProps = ({ query }) => {
-  const { userId, token } = query
-  const channelToken = token
-  const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
-  const { google } = require('googleapis')
-  const fs = require('fs')
-  const readline = require('readline')
-  const oAuth2Client = new google.auth.OAuth2(
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET,
-    process.env.REDIRECT_URL
-  )
-  const authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES })
+Index.getInitialProps = async ({ query }) => {
+  try {
+    const { userId, token } = query
+    const channelToken = token
+    const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
+    const { google } = require('googleapis')
+    const fs = require('fs')
+    const readline = require('readline')
+    const oAuth2Client = new google.auth.OAuth2(
+      process.env.CLIENT_ID,
+      process.env.CLIENT_SECRET,
+      process.env.REDIRECT_URL
+    )
+    const authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES })
 
-  // Direct the user to this URL
-  // They will be redirected back appropriately
-  console.log(authUrl)
+    // Direct the user to this URL
+    // They will be redirected back appropriately
+    // console.log(authUrl)
+    /*
+    const res = await fetch(`${process.env.HOST}/api/accounts`,  {
+    	method: 'post',
+    	headers: { 'Content-Type': 'application/json' },
+    	body: JSON.stringify({ userId: 1, token: 2 }),
+    })
+    */
+    const res = await fetch(`${process.env.HOST}/api/accounts/joduplessis`)
+    const json = await res.json()
 
+    console.log('>>> ', json)
 
-
-  return { success: true }
+    return {
+      authUrl: null
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      authUrl: null
+    }
+  }
 }
 
 export default withRouter(Index)
