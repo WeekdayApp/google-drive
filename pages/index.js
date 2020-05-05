@@ -11,6 +11,19 @@ function Index(props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [data, setData] = useState(null)
+  let popup
+
+  useEffect(() => {
+    window.addEventListener('message', event => {
+      const { oauthComplete, scope, code } = event.data
+
+      if (oauthComplete && popup) {
+        console.log({ scope, code })
+        popup.close()
+        popup = null
+      }
+    }, false)
+  })
 
   return (
     <React.Fragment>
@@ -71,7 +84,7 @@ function Index(props) {
               theme="blue-border"
               text="Connect Google Drive"
               onClick={() => {
-                openAppModal('Create a poll', 'http://localhost:3001/create', '50%', '80%', token)
+                popup = window.open(props.authUrl, 'Complete OAuth2', 'location=no,toolbar=no,menubar=no,width=600,height=500,left=200,top=100')
               }}
             />
           </div>
@@ -96,26 +109,48 @@ Index.getInitialProps = async ({ query }) => {
     )
     const authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES })
 
-    // Direct the user to this URL
-    // They will be redirected back appropriately
-    // console.log(authUrl)
     /*
+    const listFiles = (auth, token) => {
+      auth.setCredentials(token)
+      const drive = google.drive({ version: 'v3', auth })
+      drive.files.list(
+        {
+          pageSize: 10,
+          fields: 'nextPageToken, files(id, name)',
+        },
+        (err, res) => {
+          if (err) return console.log('The API returned an error: ' + err)
+          const files = res.data.files
+          if (files.length) {
+            console.log('Files:')
+            files.map(file => {
+              console.log(`${file.name} (${file.id})`)
+            })
+          } else {
+            console.log('No files found.')
+          }
+        }
+      )
+    }
+
+    listFiles(oAuth2Client, TOKEN_FROM_MONGODB)
+
+
     const res = await fetch(`${process.env.HOST}/api/accounts`,  {
     	method: 'post',
     	headers: { 'Content-Type': 'application/json' },
     	body: JSON.stringify({ userId: 1, token: 2 }),
     })
-    */
+
     const res = await fetch(`${process.env.HOST}/api/accounts/joduplessis`)
     const json = await res.json()
 
-    console.log('>>> ', json)
+    */
 
     return {
-      authUrl: null
+      authUrl
     }
   } catch (e) {
-    console.log(e)
     return {
       authUrl: null
     }
