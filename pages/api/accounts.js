@@ -42,7 +42,7 @@ handler
               authToken: base64,
               channelToken: token || 'no channelToken',
               userId: userId || 'no userId',
-              userEmail: email || 'no userEmail'
+              authEmail: email || 'no authEmail'
             })
             .then(result => {
               console.log(result)

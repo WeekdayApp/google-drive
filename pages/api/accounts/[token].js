@@ -18,6 +18,10 @@ handler
   .delete(async (req, res) => {
     let doc = await req.db.collection('accounts').findOne()
 
+    oauth2Client.revokeToken(token, function(err, body) {
+
+    })
+
     res.json(doc ? doc : {});
   })
 
