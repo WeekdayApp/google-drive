@@ -16,6 +16,7 @@ function AccountComponent(props) {
   const [files, setFiles] = useState([])
   const [pageToken, setPageToken] = useState(null)
   const [pageSize, setPageSize] = useState(10)
+  const [open, setOpen] = useState(true)
 
   const getFiles = async page => {
     const { _id, authToken, channelToken, userId, authEmail } = props.account
@@ -71,7 +72,18 @@ function AccountComponent(props) {
   return (
     <React.Fragment>
       <style scoped jsx>{`
+        .files-container {
+          width: 100%;
+          max-height: 0;
+          transition: max-height 0.15s ease-out;
+          overflow: hidden;
+        }
 
+        files-container.open {
+          max-height: 500px;
+          overflow: visible;
+          transition: max-height 0.25s ease-in;
+        }
       `}</style>
 
       <div className="row w-100 p-10 border-bottom">
@@ -82,24 +94,26 @@ function AccountComponent(props) {
           size="14"
           thickness="2"
           className="button"
-          onClick={removeAccount}
+          onClick={() => setOpen(!open)}
         />
       </div>
 
-      {files.map((file, index) => {
-        return (
-          <div className="column w-100 p-10 pt-5 pb-5" key={index}>
-            <div className="p regular color-d2">{file.name}</div>
-            <div className="row mt-5 w-100">
-              <img src={file.iconLink} height="10" className="mr-5"/>
-              <div className="small regular color-d0 mr-10">Modified {file.modifiedTime}</div>
-              <div className="flexer" />
-              <div className="small x-bold color-blue mr-10">Open</div>
-              <div className="small x-bold color-blue mr-10">Post to channel</div>
+      <div className={open ? "files-container open" : "files-container"}>
+        {files.map((file, index) => {
+          return (
+            <div className="column w-100 p-10 pt-5 pb-5" key={index}>
+              <div className="p regular color-d2">{file.name}</div>
+              <div className="row mt-5 w-100">
+                <img src={file.iconLink} height="10" className="mr-5"/>
+                <div className="small regular color-d0 mr-10">Modified {file.modifiedTime}</div>
+                <div className="flexer" />
+                <div className="small x-bold color-blue mr-10">Open</div>
+                <div className="small x-bold color-blue mr-10">Post to channel</div>
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
 
       <div className="row w-100 p-10">
         <div className="row button" onClick={removeAccount}>
