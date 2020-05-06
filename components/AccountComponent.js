@@ -44,20 +44,23 @@ function AccountComponent(props) {
 
   const removeAccount = async () => {
     const { _id, authToken, channelToken, userId, authEmail } = props.account
+    const result = confirm('Are you sure? This cannot be undone.')
 
-    fetch('/api/accounts', {
-      method: 'delete',
-      headers: {
-        authtoken: authToken,
-        accountid: _id,
-      }
-    })
-    .then(res => {
-      props.getAccounts()
-    })
-    .catch(error => {
-      setError('Error in API response')
-    })
+    if (result) {
+      fetch('/api/accounts', {
+        method: 'delete',
+        headers: {
+          authtoken: authToken,
+          accountid: _id,
+        }
+      })
+      .then(res => {
+        props.getAccounts()
+      })
+      .catch(error => {
+        setError('Error in API response')
+      })
+    }
   }
 
   useEffect(() => {
