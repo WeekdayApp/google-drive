@@ -4,6 +4,7 @@ import Head from 'next/head'
 import { Button, Error, Loading, Notification, Spinner, Collapsable } from '@tryyack/elements'
 import { openAppModal } from '@tryyack/dev-kit'
 import fetch from 'isomorphic-unfetch'
+import { ChevronDown, Trash, ChevronUp, ChevronLeft, ChevronRight } from 'react-feather'
 
 function AccountComponent(props) {
   const { router: { query }} = props
@@ -11,19 +12,48 @@ function AccountComponent(props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [data, setData] = useState(null)
+  const [page, setPage] = useState(0)
+  const [files, setFiles] = useState([])
+  const [pageToken, setPageToken] = useState(null)
+  const [pageSize, setPageSize] = useState(10)
 
-  const getAccount = async () => {
-    const channeltoken = token || '5e92a53e8314d31bbc73b0cd'
+  const getFiles = async page => {
+    const { _id, authToken, channelToken, userId, authEmail } = props.account
 
-    // Fetch all of the accounts linked to this channel
-    // using the Channel / App token
-    fetch('/api/accounts',{ headers: { channeltoken } })
+    setLoading(true)
+
+    fetch('/api/files', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ authToken, channelToken, userId, authEmail, pageToken, pageSize }),
+    })
     .then(res => res.json())
     .then(json => {
-      if (json.error) return setError('Error fetching accounts')
+      const { files, nextPageToken } = json
 
-      // Otherwise add our account to the list
-      setAccount(json.accounts)
+      // Update the files listed
+      setFiles(files)
+      setPageToken(nextPageToken)
+      setLoading(false)
+    })
+    .catch(error => {
+      setError('Error in API response')
+      setLoading(false)
+    })
+  }
+
+  const removeAccount = async () => {
+    const { _id, authToken, channelToken, userId, authEmail } = props.account
+
+    fetch('/api/accounts', {
+      method: 'delete',
+      headers: {
+        authtoken: authToken,
+        accountid: _id,
+      }
+    })
+    .then(res => {
+      props.getAccounts()
     })
     .catch(error => {
       setError('Error in API response')
@@ -31,47 +61,69 @@ function AccountComponent(props) {
   }
 
   useEffect(() => {
-    //getAccounts()
+    getFiles(0)
+    setPage(0)
   }, [])
 
   return (
     <React.Fragment>
       <style scoped jsx>{`
-        * {
-          margin: 0px;
-          padding: 0px;
-        }
 
-        body {
-          background: white;
-        }
-
-        .container {
-          background: white;
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          left: 0px;
-          top: 0px;
-          display: flex;
-          align-items: stretch;
-          align-content: center;
-          justify-content: center;
-        }
-
-        .error {
-          position: absolute;
-          top: 0px;
-          left: 0px;
-          width: 100%;
-        }
       `}</style>
 
+      <div className="row w-100 p-10 border-bottom">
+        <div className="h6 bold color-d3">{props.account.authEmail}</div>
+        <div className="flexer" />
+        <ChevronDown
+          color="#343a40"
+          size="14"
+          thickness="2"
+          className="button"
+          onClick={removeAccount}
+        />
+      </div>
 
-      <Collapsable title={props.account.authEmail}>
-        Okay
-      </Collapsable>
+      {files.map((file, index) => {
+        return (
+          <div className="column w-100 p-10 pt-5 pb-5" key={index}>
+            <div className="p regular color-d2">{file.name}</div>
+            <div className="row mt-5 w-100">
+              <img src={file.iconLink} height="10" className="mr-5"/>
+              <div className="small regular color-d0 mr-10">Modified {file.modifiedTime}</div>
+              <div className="flexer" />
+              <div className="small x-bold color-blue mr-10">Open</div>
+              <div className="small x-bold color-blue mr-10">Post to channel</div>
+            </div>
+          </div>
+        )
+      })}
 
+      <div className="row w-100 p-10">
+        <div className="row button" onClick={removeAccount}>
+          <Trash
+            color="#343a40"
+            size="14"
+            thickness="1.5"
+            className="mr-10"
+          />
+          <div className="small x-bold color-d2">REMOVE ACCOUNT</div>
+        </div>
+        <div className="flexer" />
+        <ChevronLeft
+          color="#343a40"
+          size="14"
+          thickness="2"
+          className="button"
+          onClick={removeAccount}
+        />
+        <ChevronRight
+          color="#343a40"
+          size="14"
+          thickness="2"
+          className="button ml-10"
+          onClick={removeAccount}
+        />
+      </div>
 
     </React.Fragment>
   )

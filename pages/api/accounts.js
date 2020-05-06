@@ -1,10 +1,42 @@
 import nextConnect from "next-connect";
 import middleware from "../../middleware/database";
+import { ObjectID } from "mongodb";
+import fetch from 'isomorphic-unfetch'
 
 const handler = nextConnect();
 
 handler
   .use(middleware)
+  .delete(async (req, res) => {
+    try {
+      const { headers: { authtoken, accountid } } = req
+      const authToken = JSON.parse(Buffer.from(authtoken, 'base64').toString())
+      const { google } = require('googleapis')
+      const oAuth2Client = new google.auth.OAuth2(
+        process.env.CLIENT_ID,
+        process.env.CLIENT_SECRET,
+        process.env.REDIRECT_URL
+      )
+
+      // Set up our credentials
+      oAuth2Client.setCredentials(authToken)
+
+      // Revoke this token mnually because Google's API was breaking
+      const result = await fetch('https://oauth2.googleapis.com/revoke', {
+        method: 'post',
+        headers: { 'Content-type': 'application/x-www-form-urlencoded' },
+        body: 'token=' + authToken.access_token
+      })
+
+      // Remove the DB document
+      await req.db.collection('accounts').remove({ _id: new ObjectID(accountid) })
+
+      // And all good
+      res.json({ success: true })
+    } catch (error) {
+      res.json({ error })
+    }
+  })
   .get(async (req, res) => {
     try {
       const { headers: { channeltoken } } = req

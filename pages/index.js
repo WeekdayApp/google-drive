@@ -113,9 +113,6 @@ function Index(props) {
           left: 0px;
           top: 0px;
           display: flex;
-          align-items: stretch;
-          align-content: center;
-          justify-content: center;
         }
 
         .error {
@@ -127,31 +124,33 @@ function Index(props) {
       `}</style>
 
       <div className="container column">
-        <div className="listing-container">
-          {loading && <Spinner />}
-          {error && <div className="error"><Error message={error} /></div>}
+        {loading && <Spinner />}
+        {error && <div className="error"><Error message={error} /></div>}
 
-          {accounts.length == 0 &&
-            <React.Fragment>
-              <div className="mb-20 pl-20 pr-20 text-center"><img src="https://yack-apps.s3.eu-central-1.amazonaws.com/icons/google-drive.svg" width="60%" className="mb-30"/></div>
-              <div className="h3 mb-20 pl-20 pr-20 color-d2 text-center">There are no connected accounts</div>
-              <div className="h5 mb-20 pl-20 pr-20 color-d0 text-center">Click on the button below to connect an account.</div>
-            </React.Fragment>
-          }
-
-          <div className="row justify-content-center mt-30 w-100">
-            <Button
-              size="small"
-              theme="blue-border"
-              text="Connect Google Drive"
-              onClick={() => {
-                window.authPopup = window.open(props.authUrl, 'Complete OAuth2', 'location=no,toolbar=no,menubar=no,width=600,height=500,left=200,top=100')
-              }}
-            />
+        <div className="row p-10 w-100 border-bottom">
+          <div className="p color-d2">
+            You have <strong>{accounts.length}</strong> connected accounts
           </div>
-
-          {accounts.map((account, index) => <AccountComponent account={account} key={index} />)}
+          <div className="flexer" />
+          <Button
+            size="small"
+            theme="blue-border"
+            text="Connect account"
+            onClick={() => {
+              window.authPopup = window.open(props.authUrl, 'Complete OAuth2', 'location=no,toolbar=no,menubar=no,width=600,height=500,left=200,top=100')
+            }}
+          />
         </div>
+
+        {accounts.map((account, index) => <AccountComponent getAccounts={getAccounts} account={account} key={index} />)}
+
+        {accounts.length == 0 &&
+          <div className="column align-items-center">
+            <div className="mt-40 mb-20 pl-20 pr-20 text-center"><img src="https://yack-apps.s3.eu-central-1.amazonaws.com/icons/google-drive.svg" width="60%" /></div>
+            <div className="h3 mb-20 pl-20 pr-20 color-d2 text-center">There are no connected accounts</div>
+            <div className="h5 mb-20 pl-20 pr-20 color-d0 text-center">Click on the "Connect account" button connect an account.</div>
+          </div>
+        }
       </div>
     </React.Fragment>
   )
@@ -177,34 +176,7 @@ Index.getInitialProps = async ({ query }) => {
     )
 
     // Auto generate a token so that we can immediately direct the user
-    const authUrl = oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES })
-
-    /*
-    const authToken = JSON.parse(Buffer.from('eyJhY2Nlc3NfdG9rZW4iOiJ5YTI5LmEwQWU0bHZDMW9iT1JpNFV5ZjJkdHJiaXhzdzVkZldnWnpqNTkybUQzTGpyX0VnNGpOSkl0a1Y1WDBaTnZ0Q0wza3ZwVTJZNWRKQ1hMem9Zc1dpUDZyZXlkUlRLd1lpX0dRUEJZX3BRcWZoMlJvanRoQnhLeTNpQ0t0azVRNlNVaWMxcHE5WlNjOWo5QzRwNW85Y2c3X19fMFUtT3BNU2pIS08zMCIsInJlZnJlc2hfdG9rZW4iOiIxLy8wM0t5cURVTHFJOFl5Q2dZSUFSQUFHQU1TTndGLUw5SXJ6bmo4WjNCRFRiY1BQcUk0NWJSYlhjbktnZHVNZ1k0NDNZdGZHWVMxWGJtNXdQU0x3MUpseVJJcXdpb3FGLWhLaGpzIiwic2NvcGUiOiJodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2RyaXZlLnJlYWRvbmx5IGh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1dGgvZHJpdmUuZmlsZSBodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2RyaXZlLm1ldGFkYXRhLnJlYWRvbmx5IG9wZW5pZCBodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL3VzZXJpbmZvLmVtYWlsIiwidG9rZW5fdHlwZSI6IkJlYXJlciIsImlkX3Rva2VuIjoiZXlKaGJHY2lPaUpTVXpJMU5pSXNJbXRwWkNJNklqYzBZbVE0Tm1aak5qRmxOR00yWTJJME5UQXhNalptWmpSbE16aGlNRFk1WWpobU9HWXpOV01pTENKMGVYQWlPaUpLVjFRaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJGalkyOTFiblJ6TG1kdmIyZHNaUzVqYjIwaUxDSmhlbkFpT2lJeE56QXpNekU0T0RBNE5qQXRNWEJ6Y0hGdmJteGlhRGx5YUdjMGRUQjBjSEZ2TUd0alkyNXVhV3BwTVdvdVlYQndjeTVuYjI5bmJHVjFjMlZ5WTI5dWRHVnVkQzVqYjIwaUxDSmhkV1FpT2lJeE56QXpNekU0T0RBNE5qQXRNWEJ6Y0hGdmJteGlhRGx5YUdjMGRUQjBjSEZ2TUd0alkyNXVhV3BwTVdvdVlYQndjeTVuYjI5bmJHVjFjMlZ5WTI5dWRHVnVkQzVqYjIwaUxDSnpkV0lpT2lJeE1EZzBOamczTVRRd05UVTVPVEEyTkRVNE5qVWlMQ0psYldGcGJDSTZJbXB2YUdGdWJtVnpMbVIxY0d4bGMzTnBjMEJuYldGcGJDNWpiMjBpTENKbGJXRnBiRjkyWlhKcFptbGxaQ0k2ZEhKMVpTd2lZWFJmYUdGemFDSTZJa3g2TFdZeFFqZEJia2hIU21aV05rOW9NREJ0WDBFaUxDSnBZWFFpT2pFMU9EZzJOemN5TkRrc0ltVjRjQ0k2TVRVNE9EWTRNRGcwT1gwLlZkRldKeGkxN3hNTUE4WW9XcHJIQXVZVWhKODVPekNVRnZPaVQ2c0xnMXVnVDZqM3o1empTRlhWTktsQ1JEWW1tcjVvWDdlRFRHWGJtQnU0dUpLZU9LTGdTVFl3SExfSklzd1BYSkM4aUVoc1pLWW5OM0RpbV9WbnkyZGdvR0ItSVJ4VkwwcHdVSlQtc05iTm5rS0NoX2FzY3k2NzlqbkloVHYxelZ0MHZaRFVqVlpKcllObkVOVmNITUxMRnAwaFFEUmF6b2FlYkt4LWI1b3VPM25LaVg1b1pZdEtUTWVpOWM1TzdBa0EyUG1TZGVYVkRBYXdPN2pSX0pGMUhHZk95cUlwUnA0Um92RU9waFEzVnBYSkxNdFVrbU9neHp0YTF0d2FVZU91UHR2SHZuT0NTOFAwZC05ZFpBSDhvaWdOYkVIT2E4WGZnc0NNM2VWZVdPbGl1USIsImV4cGlyeV9kYXRlIjoxNTg4NjgwODQ4NzIzfQ==', 'base64').toString())
-
-    // Set up our credentials
-    oAuth2Client.setCredentials(authToken)
-
-    // Init the drive API using our client
-    const drive = google.drive({ version: 'v3', auth: oAuth2Client })
-
-    // List of available fields
-    // https://developers.google.com/drive/api/v3/reference/files#resource
-    drive.files.list({
-      pageSize: 10,
-      pageToken: null,
-      fields: 'nextPageToken, files(id, kind, name, mimeType, webViewLink, webContentLink, iconLink, hasThumbnail, thumbnailLink, thumbnailVersion, modifiedTime, createdTime)',
-    }, (err, res) => {
-      if (err) return console.log('The API returned an error: ' + err)
-
-      // List of files / next page
-      const { files, nextPageToken } = res.data
-    })
-    */
-
-    return {
-      authUrl,
-    }
+    return { authUrl: oAuth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES }) }
   } catch (e) {
     return {
       authUrl: null
