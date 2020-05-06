@@ -7,7 +7,8 @@ handler
   .use(middleware)
   .get(async (req, res) => {
     try {
-      const { headers: { channelToken } } = req
+      const { headers: { channeltoken } } = req
+      const channelToken = channeltoken
       const accounts = await req.db.collection('accounts').find({ channelToken }).toArray()
 
       res.json({ accounts })
@@ -16,7 +17,7 @@ handler
     }
   })
   .post(async (req, res1) => {
-    const { userId, token, scope, code } = req.body
+    const { userId, channelToken, scope, code } = req.body
     const { google } = require('googleapis')
     const oAuth2Client = new google.auth.OAuth2(
       process.env.CLIENT_ID,
@@ -45,9 +46,9 @@ handler
           const base64 = Buffer.from(JSON.stringify(authToken)).toString('base64')
           const account = {
             authToken: base64,
-            channelToken: token || 'no channelToken',
+            authEmail: email || 'no authEmail',
+            channelToken: channelToken || 'no channelToken',
             userId: userId || 'no userId',
-            authEmail: email || 'no authEmail'
           }
 
           // Store this in our DB

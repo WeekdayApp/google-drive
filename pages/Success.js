@@ -13,6 +13,7 @@ function Success(props) {
   const { scope, code } = props.query
 
   useEffect(() => {
+    window.top.postMessage({ scope, code }, "*")
     window.opener.postMessage({ scope, code }, "*")
   }, [])
 

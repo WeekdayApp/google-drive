@@ -4,6 +4,8 @@ import Head from 'next/head'
 import { Button, Error, Loading, Notification, Spinner } from '@tryyack/elements'
 import { openAppModal } from '@tryyack/dev-kit'
 import fetch from 'isomorphic-unfetch'
+import AccountComponent from '../components/AccountComponent'
+import EventEmitter from 'eventemitter3'
 
 function Index(props) {
   const { router: { query }} = props
@@ -11,67 +13,77 @@ function Index(props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [data, setData] = useState(null)
-  const [accounts, setAccount] = useState(null)
-  let popup
+  const [accounts, setAccounts] = useState([])
 
   const getAccounts = async () => {
-    const channelToken = token || '5e92a53e8314d31bbc73b0cd'
+    const channeltoken = token || '5e92a53e8314d31bbc73b0cd'
+
+    // Resets
+    setLoading(true)
+    setError(null)
 
     // Fetch all of the accounts linked to this channel
     // using the Channel / App token
-    fetch('/api/accounts',{ headers: { channelToken } })
+    fetch('/api/accounts', { headers: { channeltoken } })
     .then(res => res.json())
     .then(json => {
-      const { accounts, error } = json
-
-      // If there's been an error
-      if (error) return setError('Error fetching accounts')
+      if (json.error) return setError('Error fetching accounts')
 
       // Otherwise add our account to the list
-      setAccount([account, ...accounts])
+      setAccounts(json.accounts)
+      setLoading(false)
     })
     .catch(error => {
+      setLoading(false)
       setError('Error in API response')
     })
   }
 
+  const windowMessageFromPopup = async (event) => {
+    const { scope, code } = event.data
+    const channelToken = token || '5e92a53e8314d31bbc73b0cd'
+
+    if (window.EventEmitter) window.EventEmitter.emit('account', {})
+
+    // If everything has been returned correctly
+    if (scope && code) {
+      // Kill/Close the popup first
+      window.authPopup.close()
+      window.authPopup = null
+
+      // Create the token
+      fetch('/api/accounts', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, channelToken, scope, code }),
+      })
+      .then(res => res.json())
+      .then(json => {
+        const { account, error } = json
+
+        // If there's been an error
+        if (error) return setError('Error adding account')
+
+        // Refresh our list
+        setAccounts([account, ...accounts])
+      })
+      .catch(error => {
+        setError('Error in API response')
+      })
+    }
+  }
+
   useEffect(() => {
     getAccounts()
+  }, [])
 
+  useEffect(() => {
     // If the auth window posts back a code we can handle it here
-    window.addEventListener('message', event => {
-      const { scope, code } = event.data
+    window.addEventListener('message', windowMessageFromPopup, false)
 
-      // If everything has been returned correctly
-      if (scope && code && popup) {
-        // Kill/Close the popup first
-        popup.close()
-        popup = null
-
-        // Create the token
-        fetch('/api/accounts', {
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, token, scope, code }),
-        })
-        .then(res => res.json())
-        .then(json => {
-          const { account, error } = json
-
-          // If there's been an error
-          if (error) return setError('Error adding account')
-
-          // Otherwise add our account to the list
-          setAccount([account, ...accounts])
-        })
-        .catch(error => {
-          setError('Error in API response')
-        })
-      } else {
-        setError('Incorrect response from popup')
-      }
-    }, false)
-  })
+    // Make sure we remove this every time
+    return () => window.removeEventListener('message', windowMessageFromPopup)
+  }, [accounts])
 
   return (
     <React.Fragment>
@@ -117,9 +129,9 @@ function Index(props) {
       <div className="container column">
         <div className="listing-container">
           {loading && <Spinner />}
-          {error && <div className="error"><Error message="Error loading polls" /></div>}
+          {error && <div className="error"><Error message={error} /></div>}
 
-          {!data &&
+          {accounts.length == 0 &&
             <React.Fragment>
               <div className="mb-20 pl-20 pr-20 text-center"><img src="https://yack-apps.s3.eu-central-1.amazonaws.com/icons/google-drive.svg" width="60%" className="mb-30"/></div>
               <div className="h3 mb-20 pl-20 pr-20 color-d2 text-center">There are no connected accounts</div>
@@ -133,10 +145,12 @@ function Index(props) {
               theme="blue-border"
               text="Connect Google Drive"
               onClick={() => {
-                popup = window.open(props.authUrl, 'Complete OAuth2', 'location=no,toolbar=no,menubar=no,width=600,height=500,left=200,top=100')
+                window.authPopup = window.open(props.authUrl, 'Complete OAuth2', 'location=no,toolbar=no,menubar=no,width=600,height=500,left=200,top=100')
               }}
             />
           </div>
+
+          {accounts.map((account, index) => <AccountComponent account={account} key={index} />)}
         </div>
       </div>
     </React.Fragment>
