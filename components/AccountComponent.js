@@ -24,9 +24,26 @@ function AccountComponent(props) {
   const [parent, setParent] = useState(ROOT_FOLDER)
   const [parentName, setParentName] = useState(ROOT_FOLDER_NAME)
   const [pageTokens, setPageTokens] = useState({})
+  const [browsingHistory, setBrowsingHistory] = useState([])
+  const [browsingHistoryIndex, setBrowsingHistoryIndex] = useState(-1)
 
   const goBack = () => {
+    const indexToGoBackTo = browsingHistoryIndex - 1
 
+    if (indexToGoBackTo == -1) {
+      getFiles(-1, '', 'root')
+    } else {
+      const parentToGoBackTo = browsingHistory[indexToGoBackTo]
+
+      // Get all the files
+      getFiles(-1, '', parentToGoBackTo)
+
+      // Remove the last array index
+      let currentBrowingHistory = [...browsingHistory]
+      currentBrowingHistory.pop()
+      setBrowsingHistory(currentBrowingHistory)
+      setBrowsingHistoryIndex(indexToGoBackTo)
+    }
   }
 
   const nextPage = () => {
@@ -241,6 +258,17 @@ function AccountComponent(props) {
                     setPage(-1)
                     setPageTokens({})
 
+                    // Create a new history object with the folder ID as property
+                    // And then create an updated browsingHistory
+                    // And update our state - yay for immutability
+                    let historyObject = {}
+                    historyObject[file.id] = file.name
+                    let currentBrowingHistory = [...browsingHistory]
+                    currentBrowingHistory.push(historyObject)
+                    setBrowsingHistory(currentBrowingHistory)
+                    setBrowsingHistoryIndex(browsingHistoryIndex + 1)
+
+                    // Fetch our files
                     getFiles(-1, '', file.id)
                   }
                 }}
