@@ -7,9 +7,9 @@ handler
   .use(middleware)
   .post(async (req, res1) => {
     try {
-
-      const { authToken, channelToken, userId, authEmail, pageToken, pageSize } = req.body
+      const { authToken, channelToken, userId, authEmail, pageToken, pageSize, filter } = req.body
       const authTokenJSON = JSON.parse(Buffer.from(authToken, 'base64').toString())
+      const q = filter == '' ? null : `name contains '${filter}'`
       const SCOPES = [
         // 'https://www.googleapis.com/auth/drive.readonly',
         //'https://www.googleapis.com/auth/drive.file',
@@ -31,8 +31,10 @@ handler
 
       // List of available fields
       // https://developers.google.com/drive/api/v3/reference/files#resource
+      // https://developers.google.com/drive/api/v3/search-files
       // https://developers.google.com/drive/api/v3/reference/files/list
       drive.files.list({
+        q,
         pageSize,
         pageToken,
         fields: 'nextPageToken, files(id, kind, name, mimeType, webViewLink, webContentLink, iconLink, hasThumbnail, thumbnailLink, thumbnailVersion, modifiedTime, createdTime)',
