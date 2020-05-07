@@ -14,10 +14,10 @@ function AccountComponent(props) {
   const [data, setData] = useState(null)
   const [page, setPage] = useState(-1)
   const [files, setFiles] = useState([])
-  const [pageTokens, setPageTokens] = useState([])
   const [pageSize, setPageSize] = useState(10)
   const [open, setOpen] = useState(true)
   const [filter, setFilter] = useState('')
+  const [pageTokens, setPageTokens] = useState({})
 
   const nextPage = () => {
     const newPage = page + 1
@@ -36,8 +36,7 @@ function AccountComponent(props) {
   const getFiles = async (currentPage) => {
     const { _id, authToken, channelToken, userId, authEmail } = props.account
     const pageToken = currentPage == -1 ? null : pageTokens[currentPage]
-
-    console.log({ authToken, channelToken, userId, authEmail, pageToken, pageSize, filter })
+    const nextPage = currentPage + 1
 
     setLoading(true)
 
@@ -50,14 +49,16 @@ function AccountComponent(props) {
     .then(json => {
       const { files, nextPageToken } = json
 
-      console.log(nextPageToken)
-
       // Update the files listed
       setFiles(files)
       setLoading(false)
 
+      // Create a new object
+      let updatedPageTokens = { ...pageTokens }
+      updatedPageTokens[nextPage] = nextPageToken
+
       // If there is a next page
-      if (nextPageToken) setPageTokens([...pageTokens, nextPageToken])
+      setPageTokens(updatedPageTokens)
     })
     .catch(error => {
       setError('Error in API response')
@@ -86,10 +87,35 @@ function AccountComponent(props) {
     }
   }
 
+  const renderPreviousButton = () => {
+    if (page == -1) return null
+
+    return (
+      <ChevronLeft
+        color="#5f6b7a"
+        size="14"
+        thickness="2"
+        className="button"
+        onClick={previousPage}
+      />
+    )
+  }
+
+  const renderNextButton = () => {
+    if (!pageTokens[page + 1]) return null
+
+    return (
+      <ChevronRight
+        color="#5f6b7a"
+        size="14"
+        thickness="2"
+        className="button ml-10"
+        onClick={nextPage}
+      />
+    )
+  }
+
   useEffect(() => {
-    setFilter('')
-    setPageTokens([])
-    setPage(-1)
     getFiles(-1)
   }, [])
 
@@ -140,10 +166,9 @@ function AccountComponent(props) {
             onChange={e => {
               setFilter(e.target.value)
               setPage(-1)
-              setPageTokens([])
+              setPageTokens({})
               getFiles(-1)
             }}
-
           />
           <X
             color="#5f6b7a"
@@ -153,7 +178,7 @@ function AccountComponent(props) {
             onClick={() => {
               setFilter('')
               setPage(-1)
-              setPageTokens([])
+              setPageTokens({})
               getFiles(-1)
             }}
           />
@@ -189,24 +214,8 @@ function AccountComponent(props) {
             <div className="small x-bold color-d2">REMOVE ACCOUNT</div>
           </div>
           <div className="flexer" />
-          {page != -1 &&
-            <ChevronLeft
-              color="#5f6b7a"
-              size="14"
-              thickness="2"
-              className="button"
-              onClick={previousPage}
-            />
-          }
-          {!pageTokens[page] &&
-            <ChevronRight
-              color="#5f6b7a"
-              size="14"
-              thickness="2"
-              className="button ml-10"
-              onClick={nextPage}
-            />
-          }
+          {renderPreviousButton()}
+          {renderNextButton()}
         </div>
       </div>
     </React.Fragment>

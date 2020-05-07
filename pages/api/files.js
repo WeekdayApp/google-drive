@@ -29,6 +29,8 @@ handler
       // Init the drive API using our client
       const drive = google.drive({ version: 'v3', auth: oAuth2Client })
 
+      console.log(filter)
+
       // List of available fields
       // https://developers.google.com/drive/api/v3/reference/files#resource
       // https://developers.google.com/drive/api/v3/search-files
