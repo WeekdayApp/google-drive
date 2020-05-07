@@ -7,9 +7,9 @@ handler
   .use(middleware)
   .post(async (req, res1) => {
     try {
-      const { authToken, channelToken, userId, authEmail, pageToken, pageSize, filter } = req.body
+      const { authToken, channelToken, userId, authEmail, pageToken, pageSize, filter, parent } = req.body
       const authTokenJSON = JSON.parse(Buffer.from(authToken, 'base64').toString())
-      const q = filter == '' ? null : `name contains '${filter}'`
+      const q = filter != '' ? `name contains '${filter}'` : `('${parent}' in parents)`
       const SCOPES = [
         // 'https://www.googleapis.com/auth/drive.readonly',
         //'https://www.googleapis.com/auth/drive.file',
@@ -23,13 +23,13 @@ handler
         process.env.REDIRECT_URL
       )
 
+      console.log(q)
+
       // Set up our credentials
       oAuth2Client.setCredentials(authTokenJSON)
 
       // Init the drive API using our client
       const drive = google.drive({ version: 'v3', auth: oAuth2Client })
-
-      console.log(filter)
 
       // List of available fields
       // https://developers.google.com/drive/api/v3/reference/files#resource

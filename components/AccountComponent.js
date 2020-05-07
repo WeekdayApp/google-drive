@@ -6,6 +6,10 @@ import { openAppModal } from '@tryyack/dev-kit'
 import fetch from 'isomorphic-unfetch'
 import { ChevronDown, Trash, ChevronUp, ChevronLeft, ChevronRight, X } from 'react-feather'
 
+const ROOT_FOLDER = 'root'
+const ROOT_FOLDER_NAME = 'All files & folders'
+const SEARCHING_FOLDER_NAME = 'Filtering...'
+
 function AccountComponent(props) {
   const { router: { query }} = props
   const { userId, token } = query
@@ -14,26 +18,32 @@ function AccountComponent(props) {
   const [data, setData] = useState(null)
   const [page, setPage] = useState(-1)
   const [files, setFiles] = useState([])
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(100)
   const [open, setOpen] = useState(true)
   const [filter, setFilter] = useState('')
+  const [parent, setParent] = useState(ROOT_FOLDER)
+  const [parentName, setParentName] = useState(ROOT_FOLDER_NAME)
   const [pageTokens, setPageTokens] = useState({})
+
+  const goBack = () => {
+
+  }
 
   const nextPage = () => {
     const newPage = page + 1
 
     setPage(newPage)
-    getFiles(newPage)
+    getFiles(newPage, filter, parent)
   }
 
   const previousPage = () => {
     const newPage = page - 1
 
     setPage(newPage)
-    getFiles(newPage)
+    getFiles(newPage, filter, parent)
   }
 
-  const getFiles = async (currentPage) => {
+  const getFiles = async (currentPage, filterText, parentId) => {
     const { _id, authToken, channelToken, userId, authEmail } = props.account
     const pageToken = currentPage == -1 ? null : pageTokens[currentPage]
     const nextPage = currentPage + 1
@@ -43,7 +53,16 @@ function AccountComponent(props) {
     fetch('/api/files', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ authToken, channelToken, userId, authEmail, pageToken, pageSize, filter }),
+      body: JSON.stringify({
+        authToken,
+        channelToken,
+        userId,
+        authEmail,
+        pageToken,
+        pageSize,
+        filter: filterText,
+        parent: parentId
+      }),
     })
     .then(res => res.json())
     .then(json => {
@@ -116,7 +135,7 @@ function AccountComponent(props) {
   }
 
   useEffect(() => {
-    getFiles(-1)
+    getFiles(-1, '', ROOT_FOLDER)
   }, [])
 
   return (
@@ -132,6 +151,7 @@ function AccountComponent(props) {
         .files-container.open {
           max-height: fit-content;
           transition: max-height 0.25s ease-in;
+          overflow: scroll;
         }
       `}</style>
 
@@ -158,6 +178,21 @@ function AccountComponent(props) {
         }
       </div>
 
+      <div className="row w-100 p-10 border-bottom">
+        {(parent != ROOT_FOLDER && filter == "") &&
+          <ChevronLeft
+            color="#343a40"
+            size="14"
+            thickness="2"
+            className="button mr-10"
+            onClick={() => goBack()}
+          />
+        }
+        <div className="h6 bold color-d3">
+          {parentName}
+        </div>
+      </div>
+
       <div className={open ? "files-container open" : "files-container"}>
         <div className="row w-100 p-10 border-bottom">
           <Input
@@ -165,23 +200,31 @@ function AccountComponent(props) {
             placeholder="Search for any file by name"
             onChange={e => {
               setFilter(e.target.value)
+              setParent('')
+              setParentName(SEARCHING_FOLDER_NAME)
               setPage(-1)
               setPageTokens({})
-              getFiles(-1)
+
+              getFiles(-1, e.target.value, '')
             }}
           />
-          <X
-            color="#5f6b7a"
-            size="18"
-            thickness="2"
-            className="button ml-10"
-            onClick={() => {
-              setFilter('')
-              setPage(-1)
-              setPageTokens({})
-              getFiles(-1)
-            }}
-          />
+          {filter != "" &&
+            <X
+              color="#5f6b7a"
+              size="18"
+              thickness="2"
+              className="button ml-10"
+              onClick={() => {
+                setFilter('')
+                setParent(ROOT_FOLDER)
+                setParentName(ROOT_FOLDER_NAME)
+                setPage(-1)
+                setPageTokens({})
+
+                getFiles(-1, '', ROOT_FOLDER)
+              }}
+            />
+          }
         </div>
 
         <div className="column">
@@ -189,7 +232,20 @@ function AccountComponent(props) {
             const isFolder = file.mimeType == 'application/vnd.google-apps.folder'
 
             return (
-              <div className="column w-100 p-10 pt-5 pb-5" key={index}>
+              <div
+                onClick={() => {
+                  if (isFolder) {
+                    setFilter('')
+                    setParent(file.id)
+                    setParentName(file.name)
+                    setPage(-1)
+                    setPageTokens({})
+
+                    getFiles(-1, '', file.id)
+                  }
+                }}
+                className="column w-100 p-10 pt-5 pb-5 button"
+                key={index}>
                 <div className="p regular color-d2">{file.name}</div>
                 <div className="row mt-5 w-100">
                   <img src={file.iconLink} height="10" className="mr-5"/>
