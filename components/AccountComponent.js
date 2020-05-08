@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { useRouter, withRouter } from 'next/router'
 import Head from 'next/head'
 import { Button, Error, Loading, Notification, Spinner, Collapsable, Input } from '@tryyack/elements'
-import { openAppModal } from '@tryyack/dev-kit'
 import fetch from 'isomorphic-unfetch'
 import { ChevronDown, Trash, ChevronUp, ChevronLeft, ChevronRight, X } from 'react-feather'
-import { openAppModal, createChannelMessage, deleteChannelMessagesWithResourceId } from '@tryyack/dev-kit'
+import { createChannelMessage } from '@tryyack/dev-kit'
 
 const ROOT_FOLDER = 'root'
 const ROOT_FOLDER_NAME = 'All files & folders'
@@ -31,15 +30,12 @@ function AccountComponent(props) {
   const shareFile = async (file) => {
     try {
       const channelToken = token
-      const message = 'Here is a file'
+      const message = 'Just shared a file'
       const attachments = null
-      const resourceId = JSON.stringify({
+      const resourceId = encodeURI(window.btob(JSON.stringify({
         accountId: props.account._id,
         fileId: file.id,
-      })
-
-      // We encode the values as base64 & encode for URI passing
-      const resourceIdEncoded = encodeURI(window.btob(resourceId))
+      })))
 
       // This to the cahnnel
       // Our message view will know how to deal with the encoding
@@ -48,7 +44,7 @@ function AccountComponent(props) {
         channelToken,
         message,
         attachments,
-        resourceId: resourceIdEncoded,
+        resourceId,
       )
     } catch (e) {
       setError('Could not share file')

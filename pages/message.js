@@ -11,6 +11,7 @@ function File(props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [file, setFile] = useState({ name: 'default' })
+  const [accountName, setAccountName] = useState('')
 
   useEffect(() => {
     if (!query.resourceId) return
@@ -29,10 +30,11 @@ function File(props) {
     })
     .then(res => res.json())
     .then(res => {
-        const { file } = res
+        const { file, authEmail } = res
 
         setLoading(false)
         setFile(file)
+        setAccountName(authEmail)
         syncMessageHeight(resizeId)
     })
     .catch(error => {
@@ -84,8 +86,18 @@ function File(props) {
         {loading && <Spinner />}
         {error && <div className="error"><Error message={error} /></div>}
 
-        <div className="row p-10 w-100 border-bottom">
-          {file.name}
+        <div className="row">
+          {file.iconLink &&
+            <img src={file.iconLink.replace('16', '128')} height="50" className="mr-10"/>
+          }
+          <div className="column w-100">
+            <div className="h4 color-d2 bold">{file.name}</div>
+            <div className="h6 color-d2 bold mb-5">{accountName}</div>
+            <div className="row">
+              <div className="small regular color-d0 mr-10">Modified {file.modifiedTime}</div>
+              <a href={file.webViewLink} target="_blank" className="small x-bold color-blue mr-10 button">Open</a>
+            </div>
+          </div>
         </div>
 
       </div>
