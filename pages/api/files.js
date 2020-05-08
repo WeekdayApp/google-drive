@@ -23,8 +23,6 @@ handler
         process.env.REDIRECT_URL
       )
 
-      console.log(q)
-
       // Set up our credentials
       oAuth2Client.setCredentials(authTokenJSON)
 

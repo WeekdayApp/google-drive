@@ -65,7 +65,7 @@ function Index(props) {
         if (error) return setError('Error adding account')
 
         // Refresh our list
-        setAccounts([account, ...accounts])
+        setAccounts([...accounts, account])
       })
       .catch(error => {
         setError('Error in API response')

@@ -19,7 +19,7 @@ function AccountComponent(props) {
   const [page, setPage] = useState(-1)
   const [files, setFiles] = useState([])
   const [pageSize, setPageSize] = useState(100)
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [filter, setFilter] = useState('')
   const [parent, setParent] = useState(ROOT_FOLDER)
   const [parentName, setParentName] = useState(ROOT_FOLDER_NAME)
@@ -34,15 +34,18 @@ function AccountComponent(props) {
       getFiles(-1, '', 'root')
     } else {
       const parentToGoBackTo = browsingHistory[indexToGoBackTo]
+      const { id, name } = parentToGoBackTo
 
       // Get all the files
-      getFiles(-1, '', parentToGoBackTo)
+      getFiles(-1, '', id)
 
       // Remove the last array index
       let currentBrowingHistory = [...browsingHistory]
       currentBrowingHistory.pop()
       setBrowsingHistory(currentBrowingHistory)
       setBrowsingHistoryIndex(indexToGoBackTo)
+      setParent(id)
+      setParentName(name)
     }
   }
 
@@ -195,22 +198,22 @@ function AccountComponent(props) {
         }
       </div>
 
-      <div className="row w-100 p-10 border-bottom">
-        {(parent != ROOT_FOLDER && filter == "") &&
-          <ChevronLeft
-            color="#343a40"
-            size="14"
-            thickness="2"
-            className="button mr-10"
-            onClick={() => goBack()}
-          />
-        }
-        <div className="h6 bold color-d3">
-          {parentName}
-        </div>
-      </div>
-
       <div className={open ? "files-container open" : "files-container"}>
+        <div className="row w-100 p-10 border-bottom">
+          {(parent != ROOT_FOLDER && filter == "") &&
+            <ChevronLeft
+              color="#343a40"
+              size="14"
+              thickness="2"
+              className="button mr-10"
+              onClick={() => goBack()}
+            />
+          }
+          <div className="h6 bold color-d3">
+            {parentName}
+          </div>
+        </div>
+
         <div className="row w-100 p-10 border-bottom">
           <Input
             value={filter}
@@ -261,10 +264,9 @@ function AccountComponent(props) {
                     // Create a new history object with the folder ID as property
                     // And then create an updated browsingHistory
                     // And update our state - yay for immutability
-                    let historyObject = {}
-                    historyObject[file.id] = file.name
-                    let currentBrowingHistory = [...browsingHistory]
-                    currentBrowingHistory.push(historyObject)
+                    const  { name, id } = file
+                    const currentBrowingHistory = [...browsingHistory]
+                    currentBrowingHistory.push({ name, id })
                     setBrowsingHistory(currentBrowingHistory)
                     setBrowsingHistoryIndex(browsingHistoryIndex + 1)
 
