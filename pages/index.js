@@ -162,8 +162,6 @@ Index.getInitialProps = async ({ query }) => {
     const { userId, token } = query
     const channelToken = token
     const SCOPES = [
-      // 'https://www.googleapis.com/auth/drive.readonly',
-      //'https://www.googleapis.com/auth/drive.file',
       'https://www.googleapis.com/auth/drive.metadata.readonly',
       'https://www.googleapis.com/auth/userinfo.email',
     ]

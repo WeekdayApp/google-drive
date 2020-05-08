@@ -7,7 +7,11 @@ module.exports = {
         readline: 'empty',
         child_process: 'empty',
         net: 'empty',
-        tls: 'empty'
+        tls: 'empty',
+      }
+    } else {
+      config.node = {
+        atob: 'empty',
       }
     }
 
