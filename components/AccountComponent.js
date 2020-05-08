@@ -5,6 +5,7 @@ import { Button, Error, Loading, Notification, Spinner, Collapsable, Input } fro
 import { openAppModal } from '@tryyack/dev-kit'
 import fetch from 'isomorphic-unfetch'
 import { ChevronDown, Trash, ChevronUp, ChevronLeft, ChevronRight, X } from 'react-feather'
+import { openAppModal, createChannelMessage, deleteChannelMessagesWithResourceId } from '@tryyack/dev-kit'
 
 const ROOT_FOLDER = 'root'
 const ROOT_FOLDER_NAME = 'All files & folders'
@@ -26,6 +27,34 @@ function AccountComponent(props) {
   const [pageTokens, setPageTokens] = useState({})
   const [browsingHistory, setBrowsingHistory] = useState([])
   const [browsingHistoryIndex, setBrowsingHistoryIndex] = useState(-1)
+
+  const shareFile = async (file) => {
+    try {
+      const channelToken = token
+      const message = 'Here is a file'
+      const attachments = null
+      const resourceId = JSON.stringify({
+        accountId: props.account._id,
+        fileId: file.id,
+      })
+
+      // We encode the values as base64 & encode for URI passing
+      const resourceIdEncoded = encodeURI(window.btob(resourceId))
+
+      // This to the cahnnel
+      // Our message view will know how to deal with the encoding
+      // To correctly ID the message resouce
+      await createChannelMessage(
+        channelToken,
+        message,
+        attachments,
+        resourceId: resourceIdEncoded,
+      )
+    } catch (e) {
+      setError('Could not share file')
+      setTimeout(() => setError(null), 5000)
+    }
+  }
 
   const goBack = () => {
     const indexToGoBackTo = browsingHistoryIndex - 1
@@ -282,7 +311,7 @@ function AccountComponent(props) {
                   <div className="small regular color-d0 mr-10">Modified {file.modifiedTime}</div>
                   <div className="flexer" />
                   <a href={file.webViewLink} target="_blank" className="small x-bold color-blue mr-10 button">Open</a>
-                  <div className="small x-bold color-blue mr-10 button">Post to channel</div>
+                  <div className="small x-bold color-blue mr-10 button" onClick={() => shareFile(file)}>Share file</div>
                 </div>
               </div>
             )
