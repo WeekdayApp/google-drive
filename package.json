@@ -11,7 +11,7 @@
   "author": "Jo du Plessis",
   "license": "MIT",
   "dependencies": {
-    "@tryyack/dev-kit": "^0.1.5",
+    "@tryyack/dev-kit": "^0.1.7",
     "@tryyack/elements": "^0.8.2",
     "axios": "^0.19.2",
     "eventemitter3": "^4.0.0",

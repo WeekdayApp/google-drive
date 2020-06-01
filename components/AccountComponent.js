@@ -31,11 +31,25 @@ function AccountComponent(props) {
     try {
       const channelToken = token
       const message = 'Just shared a file'
-      const attachments = null
-      const resourceId = encodeURI(window.btob(JSON.stringify({
-        accountId: props.account._id,
-        fileId: file.id,
-      })))
+      const attachments = []
+      const resourceId = encodeURI(
+        Buffer.from(
+          JSON.stringify({
+            accountId: props.account._id,
+            fileId: file.id,
+          })
+        ).toString('base64')
+      )
+
+      console.log(window)
+
+      console.log(
+        channelToken,
+        message,
+        attachments,
+        resourceId,
+        userId,
+      )
 
       // This to the cahnnel
       // Our message view will know how to deal with the encoding
@@ -45,6 +59,7 @@ function AccountComponent(props) {
         message,
         attachments,
         resourceId,
+        userId,
       )
     } catch (e) {
       setError('Could not share file')
@@ -273,6 +288,8 @@ function AccountComponent(props) {
         </div>
 
         <div className="column">
+          {error && <Error message="There was an error "/> }
+
           {files.map((file, index) => {
             const isFolder = file.mimeType == 'application/vnd.google-apps.folder'
 
@@ -299,7 +316,7 @@ function AccountComponent(props) {
                     getFiles(-1, '', file.id)
                   }
                 }}
-                className="column w-100 p-10 pt-5 pb-5 button"
+                className="column w-100 p-10 pt-5 pb-5"
                 key={index}>
                 <div className="p regular color-d2">{file.name}</div>
                 <div className="row mt-5 w-100">
