@@ -41,16 +41,6 @@ function AccountComponent(props) {
         ).toString('base64')
       )
 
-      console.log(window)
-
-      console.log(
-        channelToken,
-        message,
-        attachments,
-        resourceId,
-        userId,
-      )
-
       // This to the cahnnel
       // Our message view will know how to deal with the encoding
       // To correctly ID the message resouce

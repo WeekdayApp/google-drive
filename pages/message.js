@@ -65,13 +65,7 @@ function File(props) {
 
         .container {
           background: white;
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          left: 0px;
-          top: 0px;
-          display: flex;
-          overflow: scroll;
+          padding: 20px;
         }
 
         .error {
