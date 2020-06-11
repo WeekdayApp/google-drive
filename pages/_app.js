@@ -3,7 +3,7 @@ import { initDevKit, openAppModal } from '@tryyack/dev-kit'
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
-    initDevKit('3398a8f5-443e-4b18-9ff8-70d052a8e2ff', true)
+    initDevKit('47e58d79-f95e-4a22-94d1-cee9aacab8df', true)
   }, [])
 
   return <Component {...pageProps} />
