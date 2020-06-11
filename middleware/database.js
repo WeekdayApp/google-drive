@@ -34,8 +34,8 @@ async function database(req, res, next) {
       console.log('DB Connected')
 
       // Store the connection
-      req.knex = client;
-
+      // Buggy
+      // req.knex = client;
       // for the DELETE
       global.knex = client;
     } 
