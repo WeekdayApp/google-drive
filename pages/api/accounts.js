@@ -93,8 +93,12 @@ handler
           global
             .knex('accounts')
             .insert(account)
-            .then(res3 => {
-              res1.json({ account })
+            .returning('id')
+            .then(id => {
+              res1.json({ 
+                id: id[0],
+                ...account 
+              })
             })
             .catch(error => {
               res1.json({ error })
