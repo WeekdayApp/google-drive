@@ -96,8 +96,10 @@ handler
             .returning('id')
             .then(id => {
               res1.json({ 
-                id: id[0],
-                ...account 
+                account: {
+                  id: id[0],
+                  ...account 
+                }
               })
             })
             .catch(error => {
