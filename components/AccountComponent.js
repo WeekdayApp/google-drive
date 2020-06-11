@@ -35,7 +35,7 @@ function AccountComponent(props) {
       const resourceId = encodeURI(
         Buffer.from(
           JSON.stringify({
-            accountId: props.account._id,
+            accountId: props.account.id,
             fileId: file.id,
           })
         ).toString('base64')
@@ -94,7 +94,7 @@ function AccountComponent(props) {
   }
 
   const getFiles = async (currentPage, filterText, parentId) => {
-    const { _id, authToken, channelToken, userId, authEmail } = props.account
+    const { id, authToken, channelToken, userId, authEmail } = props.account
     const pageToken = currentPage == -1 ? null : pageTokens[currentPage]
     const nextPage = currentPage + 1
 
@@ -136,7 +136,7 @@ function AccountComponent(props) {
   }
 
   const removeAccount = async () => {
-    const { _id, authToken, channelToken, userId, authEmail } = props.account
+    const { id, authToken, channelToken, userId, authEmail } = props.account
     const result = confirm('Are you sure? This cannot be undone.')
 
     if (result) {
@@ -144,7 +144,7 @@ function AccountComponent(props) {
         method: 'delete',
         headers: {
           authtoken: authToken,
-          accountid: _id,
+          accountid: id,
         }
       })
       .then(res => {

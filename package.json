@@ -17,12 +17,14 @@
     "eventemitter3": "^4.0.0",
     "googleapis": "^49.0.0",
     "isomorphic-unfetch": "^3.0.0",
+    "knex": "^0.21.1",
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.12",
     "next": "^9.3.6",
     "next-connect": "^0.6.5",
-    "react-feather": "git+https://github.com/joduplessis/react-feather.git",
+    "pg": "^8.2.1",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-feather": "git+https://github.com/joduplessis/react-feather.git"
   }
 }

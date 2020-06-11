@@ -30,7 +30,7 @@ function Index(props) {
       if (json.error) return setError('Error fetching accounts')
 
       // Otherwise add our account to the list
-      setAccounts(json.accounts)
+      setAccounts(json.accounts || [])
       setLoading(false)
     })
     .catch(error => {

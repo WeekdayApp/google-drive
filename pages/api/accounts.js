@@ -1,7 +1,7 @@
 import nextConnect from "next-connect";
 import middleware from "../../middleware/database";
-import { ObjectID } from "mongodb";
 import fetch from 'isomorphic-unfetch'
+import { deleteChannelMessagesWithResourceId } from "@tryyack/dev-kit";
 
 const handler = nextConnect();
 
@@ -10,6 +10,7 @@ handler
   .delete(async (req, res) => {
     try {
       const { headers: { authtoken, accountid } } = req
+      const accountId = accountid
       const authToken = JSON.parse(Buffer.from(authtoken, 'base64').toString())
       const { google } = require('googleapis')
       const oAuth2Client = new google.auth.OAuth2(
@@ -22,18 +23,21 @@ handler
       oAuth2Client.setCredentials(authToken)
 
       // Revoke this token mnually because Google's API was breaking
-      const result = await fetch('https://oauth2.googleapis.com/revoke', {
+      // We don't need a return
+      await fetch('https://oauth2.googleapis.com/revoke', {
         method: 'post',
         headers: { 'Content-type': 'application/x-www-form-urlencoded' },
         body: 'token=' + authToken.access_token
       })
 
       // Remove the DB document
-      await req.db.collection('accounts').remove({ _id: new ObjectID(accountid) })
+      // For some reason the middleware isn't adding knex to this path
+      await global.knex('accounts').where('id', accountId).del()
 
       // And all good
       res.json({ success: true })
     } catch (error) {
+      console.log(error)
       res.json({ error })
     }
   })
@@ -41,7 +45,7 @@ handler
     try {
       const { headers: { channeltoken } } = req
       const channelToken = channeltoken
-      const accounts = await req.db.collection('accounts').find({ channelToken }).toArray()
+      const accounts = await global.knex('accounts').where('channelToken', channelToken)
 
       res.json({ accounts })
     } catch (error) {
@@ -86,10 +90,9 @@ handler
           // Store this in our DB
           // And then send back the new account to the caller
           // res1 is our API res
-          req
-            .db
-            .collection('accounts')
-            .insertOne(account)
+          global
+            .knex('accounts')
+            .insert(account)
             .then(res3 => {
               res1.json({ account })
             })

@@ -1,22 +1,44 @@
 import { MongoClient } from "mongodb";
 import nextConnect from "next-connect";
+import knex from "knex";
 
-const client = new MongoClient(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+let client;
 
 async function database(req, res, next) {
   try {
-    if (!client.isConnected()) await client.connect();
+    if (!client) {
+      client = knex({
+        client: 'pg',
+        connection: {
+          host : process.env.DB_HOST,
+          user : process.env.DB_USER,
+          password : process.env.DB_PASSWORD,
+          database : process.env.DB_NAME
+        }
+      });
+      
+      // Create a table
+      await client.schema.hasTable('accounts').then((exists) => {
+        if (!exists) {
+          return client.schema.createTable('accounts', table => {
+              table.increments('id');
+              table.text('authEmail');
+              table.text('authToken');
+              table.text('channelToken');
+              table.text('userId');
+              table.timestamps();
+            });
+        }
+      })
 
-    req.dbClient = client;
-    req.db = client.db("apps");
-    req.db.createCollection("accounts", { "capped": false, "size": 100000, "max": 5000 }, (err, results) => {
-      console.log("Collection created.");
-    });
+      console.log('DB Connected')
 
-    console.log('DB Connected')
+      // Store the connection
+      req.knex = client;
+
+      // for the DELETE
+      global.knex = client;
+    } 
 
     return next();
   } catch (e) {

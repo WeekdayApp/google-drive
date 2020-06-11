@@ -9,7 +9,7 @@ handler
   .post(async (req, res1) => {
     try {
       const { accountId, fileId } = req.body
-      const account = await req.db.collection('accounts').findOne({ _id: new ObjectID(accountId) })
+      const account = await req.knex('accounts').where('id', accountId)
       const { authToken, authEmail, channelToken, userId } = account
       const authTokenJSON = JSON.parse(Buffer.from(authToken, 'base64').toString())
       const SCOPES = [
