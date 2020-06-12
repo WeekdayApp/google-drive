@@ -16,3 +16,4 @@ yarn-error.log
 out_lambda
 credentials.json
 .env
+environment.js
