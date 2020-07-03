@@ -1,7 +1,7 @@
 import nextConnect from "next-connect";
 import middleware from "../../middleware/database";
 import fetch from 'isomorphic-unfetch'
-import { deleteChannelMessagesWithResourceId } from "@tryyack/dev-kit";
+import { deleteChannelMessagesWithResourceId } from "@weekday/dev-kit";
 
 const handler = nextConnect();
 

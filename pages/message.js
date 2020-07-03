@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter, withRouter } from 'next/router'
 import Head from 'next/head'
-import { Button, Error, Loading, Notification, Spinner } from '@tryyack/elements'
+import { Button, Error, Loading, Notification, Spinner } from '@weekday/elements'
 import fetch from 'isomorphic-unfetch'
-import { syncMessageHeight } from '@tryyack/dev-kit'
+import { syncMessageHeight } from '@weekday/dev-kit'
 
 function File(props) {
   const { router: { query }} = props
@@ -48,7 +48,7 @@ function File(props) {
       <Head>
         <title>Google Drive</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <link href="https://yack-apps.s3.eu-central-1.amazonaws.com/favicon.png" rel="shortcut icon" />
+        <link href="https://weekday-apps.s3.eu-central-1.amazonaws.com/favicon.png" rel="shortcut icon" />
         <link href="/static/css/styles.css" rel="stylesheet" />
       </Head>
 

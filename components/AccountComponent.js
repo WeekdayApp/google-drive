@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter, withRouter } from 'next/router'
 import Head from 'next/head'
-import { Button, Error, Loading, Notification, Spinner, Collapsable, Input } from '@tryyack/elements'
+import { Button, Error, Loading, Notification, Spinner, Collapsable, Input } from '@weekday/elements'
 import fetch from 'isomorphic-unfetch'
 import { ChevronDown, Trash, ChevronUp, ChevronLeft, ChevronRight, X } from 'react-feather'
-import { createChannelMessage } from '@tryyack/dev-kit'
+import { createChannelMessage } from '@weekday/dev-kit'
 
 const ROOT_FOLDER = 'root'
 const ROOT_FOLDER_NAME = 'All files & folders'

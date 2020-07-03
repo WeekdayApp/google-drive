@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter, withRouter } from 'next/router'
 import Head from 'next/head'
-import { Button, Error, Loading, Notification, Spinner } from '@tryyack/elements'
-import { openAppModal } from '@tryyack/dev-kit'
+import { Button, Error, Loading, Notification, Spinner } from '@weekday/elements'
+import { openAppModal } from '@weekday/dev-kit'
 import fetch from 'isomorphic-unfetch'
 import AccountComponent from '../components/AccountComponent'
 import EventEmitter from 'eventemitter3'
@@ -90,7 +90,7 @@ function Index(props) {
       <Head>
         <title>Google Drive</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <link href="https://yack-apps.s3.eu-central-1.amazonaws.com/favicon.png" rel="shortcut icon" />
+        <link href="https://weekday-apps.s3.eu-central-1.amazonaws.com/favicon.png" rel="shortcut icon" />
         <link href="/static/css/styles.css" rel="stylesheet" />
       </Head>
 
@@ -147,7 +147,7 @@ function Index(props) {
 
         {accounts.length == 0 &&
           <div className="column align-items-center">
-            <div className="mt-40 mb-20 pl-20 pr-20 text-center"><img src="https://yack-apps.s3.eu-central-1.amazonaws.com/icons/google-drive.svg" width="60%" /></div>
+            <div className="mt-40 mb-20 pl-20 pr-20 text-center"><img src="https://weekday-apps.s3.eu-central-1.amazonaws.com/icons/google-drive.svg" width="60%" /></div>
             <div className="h3 mb-20 pl-20 pr-20 color-d2 text-center">There are no connected accounts</div>
             <div className="h5 mb-20 pl-20 pr-20 color-d0 text-center">Click on the "Connect account" button connect an account.</div>
           </div>
