@@ -285,7 +285,10 @@ function AccountComponent(props) {
 
             return (
               <div
-                onClick={() => {
+                onClick={e => {
+                  if (!e.target) return 
+                  if (e.target.tagName.toLowerCase() === 'a') return 
+
                   if (isFolder) {
                     setFilter('')
                     setParent(file.id)
@@ -306,7 +309,7 @@ function AccountComponent(props) {
                     getFiles(-1, '', file.id)
                   }
                 }}
-                className="column w-100 p-10 pt-5 pb-5"
+                className="column w-100 p-10 pt-5 pb-5 button"
                 key={index}>
                 <div className="p regular color-d2">{file.name}</div>
                 <div className="row mt-5 w-100">
