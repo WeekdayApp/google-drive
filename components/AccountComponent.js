@@ -209,7 +209,7 @@ function AccountComponent(props) {
         <div className="h6 bold color-d3">{props.account.authEmail}</div>
         <div className="flexer" />
         {open &&
-          <ChevronUp
+          <ChevronDown
             color="#343a40"
             size="14"
             thickness="2"
@@ -218,7 +218,7 @@ function AccountComponent(props) {
           />
         }
         {!open &&
-          <ChevronDown
+          <ChevronLeft
             color="#343a40"
             size="14"
             thickness="2"
