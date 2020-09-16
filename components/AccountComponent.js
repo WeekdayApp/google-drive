@@ -285,33 +285,36 @@ function AccountComponent(props) {
 
             return (
               <div
-                onClick={e => {
-                  if (!e.target) return 
-                  if (e.target.tagName.toLowerCase() === 'a') return 
-
-                  if (isFolder) {
-                    setFilter('')
-                    setParent(file.id)
-                    setParentName(file.name)
-                    setPage(-1)
-                    setPageTokens({})
-
-                    // Create a new history object with the folder ID as property
-                    // And then create an updated browsingHistory
-                    // And update our state - yay for immutability
-                    const  { name, id } = file
-                    const currentBrowingHistory = [...browsingHistory]
-                    currentBrowingHistory.push({ name, id })
-                    setBrowsingHistory(currentBrowingHistory)
-                    setBrowsingHistoryIndex(browsingHistoryIndex + 1)
-
-                    // Fetch our files
-                    getFiles(-1, '', file.id)
-                  }
-                }}
-                className="column w-100 p-10 pt-5 pb-5 button"
+                className="column w-100 p-10 pt-5 pb-5"
                 key={index}>
-                <div className="p regular color-d2">{file.name}</div>
+                <div 
+                  onClick={e => {
+                    if (!e.target) return 
+                    if (e.target.tagName.toLowerCase() === 'a') return 
+
+                    if (isFolder) {
+                      setFilter('')
+                      setParent(file.id)
+                      setParentName(file.name)
+                      setPage(-1)
+                      setPageTokens({})
+
+                      // Create a new history object with the folder ID as property
+                      // And then create an updated browsingHistory
+                      // And update our state - yay for immutability
+                      const  { name, id } = file
+                      const currentBrowingHistory = [...browsingHistory]
+                      currentBrowingHistory.push({ name, id })
+                      setBrowsingHistory(currentBrowingHistory)
+                      setBrowsingHistoryIndex(browsingHistoryIndex + 1)
+
+                      // Fetch our files
+                      getFiles(-1, '', file.id)
+                    }
+                  }}  
+                  className="p regular color-d2 button">
+                  {file.name}
+                </div>
                 <div className="row mt-5 w-100">
                   <img src={file.iconLink} height="10" className="mr-5"/>
                   <div className="small regular color-d0 mr-10">Modified {file.modifiedTime}</div>
