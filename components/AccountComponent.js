@@ -29,8 +29,9 @@ function AccountComponent(props) {
 
   const shareFile = async (file) => {
     try {
+      const { webViewLink } = file
       const channelToken = token
-      const message = 'Just shared a file'
+      const message = webViewLink ? webViewLink : 'Just shared a file'
       const attachments = []
       const resourceId = encodeURI(
         Buffer.from(
