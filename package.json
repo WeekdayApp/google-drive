@@ -11,7 +11,7 @@
   "author": "Jo du Plessis",
   "license": "MIT",
   "dependencies": {
-    "@weekday/dev-kit": "^0.1.10",
+    "@weekday/dev-kit": "^0.1.12",
     "@weekday/elements": "^0.9.30",
     "axios": "^0.19.2",
     "eventemitter3": "^4.0.0",
