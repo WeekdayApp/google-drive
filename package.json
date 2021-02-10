@@ -13,7 +13,7 @@
   "dependencies": {
     "@weekday/dev-kit": "^0.1.13",
     "@weekday/elements": "^0.9.30",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "eventemitter3": "^4.0.0",
     "googleapis": "^49.0.0",
     "isomorphic-unfetch": "^3.0.0",
