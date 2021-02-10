@@ -5,7 +5,7 @@ import { APP_TOKEN } from '../environment'
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
     // true = DEV
-    // ⚠️ Remember to set this for true
+    // false = PROD
     initDevKit(APP_TOKEN, false)
   }, [])
 

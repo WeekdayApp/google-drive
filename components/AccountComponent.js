@@ -30,7 +30,6 @@ function AccountComponent(props) {
   const shareFile = async (file) => {
     try {
       const { webViewLink } = file
-      const channelToken = token
       const message = webViewLink ? webViewLink : 'Just shared a file'
       const attachments = []
       const resourceId = encodeURI(
@@ -46,11 +45,10 @@ function AccountComponent(props) {
       // Our message view will know how to deal with the encoding
       // To correctly ID the message resouce
       await createChannelMessage(
-        channelToken,
+        token,
         message,
         attachments,
         resourceId,
-        userId,
       )
     } catch (e) {
       setError('Could not share file')
